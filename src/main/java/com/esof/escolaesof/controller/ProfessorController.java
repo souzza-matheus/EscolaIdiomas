@@ -58,7 +58,7 @@ public class ProfessorController {
 	           .map(Professor -> {
 	               Professor.setNome(professor.getNome());
 	               Professor.setSobrenome(professor.getSobrenome());
-	               Professor.setIdioma(professor.getIdioma());
+	               Professor.setCurso(professor.getCurso());
 	               Professor.setTurno(professor.getTurno());
 	               Professor.setEmail(professor.getEmail());
 	               Professor.setTelefone(professor.getTelefone());
