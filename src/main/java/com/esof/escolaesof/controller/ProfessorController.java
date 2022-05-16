@@ -20,7 +20,7 @@ import com.esof.escolaesof.model.Professor;
 import com.esof.escolaesof.repository.ProfessorRepository;
 
 @RestController
-@RequestMapping("/professor")
+@RequestMapping("api/v1/escolaIdiomas/professor")
 public class ProfessorController {
 	
 	@Autowired

@@ -17,7 +17,7 @@ public class Professor {
 	
 	private String nome;	
 	private String sobrenome;
-	private String idioma;
+	private String curso;
 	private String turno;
 	private String email;
 	private String telefone;
@@ -43,12 +43,12 @@ public class Professor {
 		this.sobrenome = sobrenome;
 	}
 
-	public String getIdioma() {
-		return idioma;
+	public String getCurso() {
+		return curso;
 	}
 
-	public void setIdioma(String idioma) {
-		this.idioma = idioma;
+	public void setCurso(String curso) {
+		this.curso = curso;
 	}
 
 	public String getTurno() {
