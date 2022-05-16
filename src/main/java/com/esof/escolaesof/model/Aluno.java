@@ -19,7 +19,7 @@ public class Aluno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
-    private String matricula;
+    private Long matricula;
 
     @Column(nullable = false)
     private String nome;
