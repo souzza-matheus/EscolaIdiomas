@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.esof.escolaesof.exception.ContatoDeResponsavelNotFoundException;
+import com.esof.escolaesof.exception.NomeDeResponsavelNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,8 +39,16 @@ public class AlunoController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<Aluno> cadastrarAluno(@RequestBody Aluno aluno ){
+    public ResponseEntity<Aluno> cadastrarAluno(@RequestBody Aluno aluno ) throws ContatoDeResponsavelNotFoundException, NomeDeResponsavelNotFoundException {
+        if(aluno.getIdade() < 18 && aluno.getEmail_responsavel() == null || aluno.getIdade() < 18 && aluno.getTelefone_responsavel() == null ){
+            throw new ContatoDeResponsavelNotFoundException();
+        }
+        if(aluno.getIdade() < 18 && aluno.getNome_responsavel() == null){
+            throw  new NomeDeResponsavelNotFoundException();
+        }
+
         Aluno novoAluno=  alunoRepository.save(aluno);
+
         return new ResponseEntity<>(novoAluno, HttpStatus.CREATED);
     }
 
