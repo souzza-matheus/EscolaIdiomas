@@ -36,6 +36,7 @@ public class ProfessorController {
 	public String cadastrar(@RequestBody Professor _professor) throws SQLException {
 
 		ArrayList<String> _validationMsgs = new ArrayList<String>();
+		String erroMsg = "";
 		
 		if(validarProfessor(_professor, _validationMsgs)){
 			
@@ -43,12 +44,17 @@ public class ProfessorController {
 				_professorRepository.save(_professor);
 				return "Cadastro realizado com sucesso!";
 				
-			} catch (Exception e) {			
+			} catch (Exception e) {	
+
 				return "Falha ao realizar o cadastro";
 			}	
 		}
 		else{
-			return "Falha ao realizar o cadastro";
+			for (String erro : _validationMsgs) {
+				erroMsg += erro + ", ";
+				
+			}
+			return "Falha ao realizar o cadastro: " + erroMsg;
 		}
 	
 	
@@ -97,11 +103,7 @@ public class ProfessorController {
 			return false;
 		}
 		
-		if(professor.getCurso() == null || professor.getCurso().isEmpty()) {
-			validationMsg.add("Curso não pode ser vazio");
-			return false;
-		}
-		
+				
 		if(professor.getTurno() == null || professor.getTurno().isEmpty()) {
 			validationMsg.add("Turno não pode ser vazio");
 			return false;

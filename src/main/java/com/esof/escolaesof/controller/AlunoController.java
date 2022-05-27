@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
-
 import com.esof.escolaesof.exception.ContatoDeResponsavelNotFoundException;
 import com.esof.escolaesof.exception.NomeDeResponsavelNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +17,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.esof.escolaesof.exception.AlunoNotFoundException;
 import com.esof.escolaesof.model.Aluno;
 import com.esof.escolaesof.repository.AlunoRepository;
-
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -75,5 +72,38 @@ public class AlunoController {
       private Aluno verifyIfExists(Long matricula) throws AlunoNotFoundException {
         return alunoRepository.findById(matricula).orElseThrow(()->new AlunoNotFoundException(matricula));
     }
+
+    public boolean validaAluno(Aluno aluno, ArrayList<String> validationMsg){
+
+        if(aluno.getNome() == null || aluno.getNome().isEmpty()){
+            validationMsg.add("Nome não pode ser vazio");
+            return false;
+        }
+        if(aluno.getIdade() < 0){
+            validationMsg.add("Idade não pode ser negativa");
+            return false;
+        }
+        if(aluno.getEmail() == null || aluno.getEmail().isEmpty()){
+            validationMsg.add("Email não pode ser vazio");
+            return false;
+        }
+        if(!validaEmail(aluno.getEmail())){
+            validationMsg.add("Email inválido");
+            return false;
+        }
+
+        if(aluno.getTelefone() == null || aluno.getTelefone().isEmpty()){
+            validationMsg.add("Telefone não pode ser vazio");
+            return false;
+        }
+        return true;
+        
+    }
+
+    public boolean validaEmail(String Email){
+		
+		return Email.matches("^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$");
+
+	}
     
 }
