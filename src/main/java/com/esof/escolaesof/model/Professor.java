@@ -21,7 +21,7 @@ public class Professor {
 	private String sobrenome;
 
 	@OneToOne
-	@JoinColumn(name = "curso_codigo", referencedColumnName = "codigo")
+	@JoinColumn(name = "curso_id", referencedColumnName = "id")
 	private Curso curso;
 
 	private String turno;

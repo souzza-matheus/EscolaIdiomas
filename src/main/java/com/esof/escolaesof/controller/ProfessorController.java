@@ -3,6 +3,14 @@ package com.esof.escolaesof.controller;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.esof.escolaesof.dto.AlunoDTO;
+import com.esof.escolaesof.dto.ProfessorDTO;
+import com.esof.escolaesof.model.Aluno;
+import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,30 +26,34 @@ import org.springframework.web.bind.annotation.RestController;
 import com.esof.escolaesof.model.Professor;
 import com.esof.escolaesof.repository.ProfessorRepository;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("api/v1/escolaIdiomas/professor")
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class ProfessorController {
-	
-	@Autowired
-	private ProfessorRepository _professorRepository;
+
+	private final  ProfessorRepository _professorRepository;
+	private final ModelMapper modelMapper;
 	
 	@GetMapping
-	public List<Professor> Listar(){
+	public ResponseEntity<List<ProfessorDTO>> Listar(){
 		
-		return _professorRepository.findAll();
+		return ResponseEntity.ok(_professorRepository.findAll().stream().map(this::entityToDto)
+				.collect(Collectors.toList()));
 	}
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public String cadastrar(@RequestBody Professor _professor) throws SQLException {
+	public String cadastrar(@RequestBody @Valid ProfessorDTO _professor) throws SQLException {
 
 		ArrayList<String> _validationMsgs = new ArrayList<String>();
 		String erroMsg = "";
 		
-		if(validarProfessor(_professor, _validationMsgs)){
+		if(validarProfessor(dtoToEntity(_professor), _validationMsgs)){
 			
 			try {			
-				_professorRepository.save(_professor);
+				_professorRepository.save(dtoToEntity(_professor));
 				return "Cadastro realizado com sucesso!";
 				
 			} catch (Exception e) {	
@@ -61,14 +73,14 @@ public class ProfessorController {
 	}
 	
 	@GetMapping(path = {"/{id}"})
-	public ResponseEntity findById(@PathVariable long id){
+	public ResponseEntity<ProfessorDTO> findById(@PathVariable long id){
 	   return _professorRepository.findById(id)
-	           .map(record -> ResponseEntity.ok().body(record))
+	           .map(record -> ResponseEntity.ok().body(entityToDto(record)))
 	           .orElse(ResponseEntity.notFound().build());
 	}
 	
 	@PutMapping(value="/{id}")
-	public ResponseEntity update(@PathVariable("id") long id, @RequestBody Professor professor) {
+	public ResponseEntity<ProfessorDTO> update(@PathVariable("id") long id, @RequestBody @Valid ProfessorDTO professor) {
 	   return _professorRepository.findById(id)
 	           .map(Professor -> {
 	               Professor.setNome(professor.getNome());
@@ -77,8 +89,8 @@ public class ProfessorController {
 	               Professor.setTurno(professor.getTurno());
 	               Professor.setEmail(professor.getEmail());
 	               Professor.setTelefone(professor.getTelefone());
-	               Professor updated = _professorRepository.save(professor);
-	               return ResponseEntity.ok().body(updated);
+	               Professor updated = _professorRepository.save(dtoToEntity(professor));
+	               return ResponseEntity.ok().body(entityToDto(updated));
 	           }).orElse(ResponseEntity.notFound().build());
 	}
 	
@@ -130,5 +142,19 @@ public class ProfessorController {
 		
 		return Email.matches("^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$");
 
+	}
+
+	private ProfessorDTO entityToDto(Professor professor){
+		modelMapper.getConfiguration()
+				.setMatchingStrategy(MatchingStrategies.LOOSE);
+		new ProfessorDTO();
+		return modelMapper.map(professor,ProfessorDTO.class);
+	}
+
+	private Professor dtoToEntity(ProfessorDTO professorDTO){
+		modelMapper.getConfiguration()
+				.setMatchingStrategy(MatchingStrategies.LOOSE);
+		new Professor();
+		return modelMapper.map(professorDTO,Professor.class);
 	}
 }
