@@ -2,14 +2,13 @@ package com.esof.escolaesof.model;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 public class Aluno {
 
     @Id
@@ -21,7 +20,7 @@ public class Aluno {
     private String nome;
 
     @ManyToOne()
-    @JoinColumn(name = "curso_codigo")
+    @JoinColumn(name = "curso_id")
     private Curso curso;
 
     @Column(nullable = false)
@@ -37,4 +36,18 @@ public class Aluno {
 
     private String email_responsavel;
 
+    @JsonCreator
+    public Aluno(Long matricula, String nome, Curso curso, int idade, String email, String telefone, String nome_responsavel, String telefone_responsavel, String email_responsavel) {
+        this.matricula = matricula;
+        this.nome = nome;
+        this.curso = curso;
+        this.idade = idade;
+        this.email = email;
+        this.telefone = telefone;
+        this.nome_responsavel = nome_responsavel;
+        this.telefone_responsavel = telefone_responsavel;
+        this.email_responsavel = email_responsavel;
+    }
+
+    public Aluno (){}
 }

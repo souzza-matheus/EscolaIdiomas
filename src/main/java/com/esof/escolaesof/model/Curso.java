@@ -1,5 +1,6 @@
 package com.esof.escolaesof.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ public class Curso {
     private String turno;
 
     @OneToOne(mappedBy = "curso")
+    @JsonBackReference
     private Professor professor;
 
 
