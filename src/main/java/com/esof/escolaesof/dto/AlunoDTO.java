@@ -1,10 +1,12 @@
 package com.esof.escolaesof.dto;
 
+import com.esof.escolaesof.model.Aluno;
 import com.esof.escolaesof.model.Curso;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.modelmapper.convention.MatchingStrategies;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -38,5 +40,4 @@ public class AlunoDTO {
     private String telefone_responsavel;
 
     private String email_responsavel;
-
 }
