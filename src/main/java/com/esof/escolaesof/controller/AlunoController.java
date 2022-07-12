@@ -1,7 +1,5 @@
 package com.esof.escolaesof.controller;
 
-import java.util.ArrayList;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,14 +14,7 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.esof.escolaesof.exception.AlunoNotFoundException;
 import com.esof.escolaesof.model.Aluno;
 import com.esof.escolaesof.repository.AlunoRepository;
@@ -38,9 +29,15 @@ public class AlunoController {
     private final ModelMapper modelMapper;
 
     @GetMapping
-    public ResponseEntity<List<AlunoDTO>> listarTodosAlunos(){
-        return ResponseEntity.ok(alunoRepository.findAll().stream().map(this::entityToDto)
-                        .collect(Collectors.toList()));
+    public List<AlunoDTO> listarTodosAlunos(@RequestParam(required= false) Long curso_id){
+
+        if(curso_id == null) {
+            return alunoRepository.findAll().stream().map(this::entityToDto)
+                    .collect(Collectors.toList());
+
+        }else {
+            return alunoRepository.findByCursoId(curso_id).stream().map(this::entityToDto).collect(Collectors.toList());
+        }
     }
 
     @PostMapping
