@@ -1,10 +1,12 @@
 package com.esof.escolaesof.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -16,6 +18,9 @@ public class Curso {
 
     @Id
     @Column(nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String codigo;
 
     private String nome;
@@ -26,13 +31,11 @@ public class Curso {
 
     private String turno;
 
-    @OneToMany(mappedBy = "curso",
-    cascade = CascadeType.ALL,
-    orphanRemoval = true)
-    private List<Aluno> alunos;
-
     @OneToOne(mappedBy = "curso")
+    @JsonBackReference
     private Professor professor;
+
+
 
 }
 

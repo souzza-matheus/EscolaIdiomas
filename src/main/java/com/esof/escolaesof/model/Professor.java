@@ -2,6 +2,7 @@ package com.esof.escolaesof.model;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,8 @@ public class Professor {
 	private String sobrenome;
 
 	@OneToOne
-	@JoinColumn(name = "curso_codigo", referencedColumnName = "codigo")
+	@JoinColumn(name = "curso_id", referencedColumnName = "id")
+	@JsonManagedReference
 	private Curso curso;
 
 	private String turno;

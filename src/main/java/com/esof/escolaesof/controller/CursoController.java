@@ -1,4 +1,10 @@
 package com.esof.escolaesof.controller;
+import com.esof.escolaesof.dto.AlunoDTO;
+import com.esof.escolaesof.dto.CursoDTO;
+import com.esof.escolaesof.model.Aluno;
+import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,28 +21,34 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 import com.esof.escolaesof.model.Curso;
 import com.esof.escolaesof.repository.CursoRepository;
+
+import javax.validation.Valid;
 
 
 @RestController
 @RequestMapping("api/v1/escolaIdiomas/curso")
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class CursoController {
 
-    @Autowired
+
 	private CursoRepository _cursoRepository;
+    private final ModelMapper modelMapper;
 
     @PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-    public String cadastrar(@RequestBody Curso _curso) throws SQLException {
+    public String cadastrar(@RequestBody @Valid CursoDTO _curso) throws SQLException {
 
         ArrayList<String> _validationMsgs = new ArrayList<String>();
         String erroMsg = "";
 
         try {
 
-            if (validarCurso(_curso, _validationMsgs)) {
-                _cursoRepository.save(_curso);
+            if (validarCurso(dtoToEntity(_curso), _validationMsgs)) {
+                _cursoRepository.save(dtoToEntity(_curso));
                 return "Cadastro realizado com sucesso!";
 
             } else {
@@ -53,32 +65,33 @@ public class CursoController {
     }
 
     @GetMapping
-    public List<Curso> listar() {
-        return _cursoRepository.findAll();
+    public ResponseEntity<List<CursoDTO>> listar() {
+        return ResponseEntity.ok(_cursoRepository.findAll().stream().map(this::entityToDto)
+                .collect(Collectors.toList()));
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity FindById(@PathVariable long id){
+    public ResponseEntity<CursoDTO> FindById(@PathVariable long id){
         return _cursoRepository.findById(id)
-	           .map(record -> ResponseEntity.ok().body(record))
+	           .map(record -> ResponseEntity.ok().body(entityToDto(record)))
 	           .orElse(ResponseEntity.notFound().build());
         
     }
 
     @PutMapping(value="/{id}")
-	public ResponseEntity update(@PathVariable("id") long id, @RequestBody Curso curso) {
+	public ResponseEntity<CursoDTO> update(@PathVariable("id") long id, @RequestBody @Valid CursoDTO curso) {
 	   return _cursoRepository.findById(id)
        .map(Curso -> {
         Curso.setNome(curso.getNome());
         Curso.setIdioma(curso.getIdioma());
         Curso.setNivel(curso.getNivel());
         Curso.setTurno(curso.getTurno());
-        Curso updated = _cursoRepository.save(curso);
-        return ResponseEntity.ok().body(updated);
+        Curso updated = _cursoRepository.save(dtoToEntity(curso));
+        return ResponseEntity.ok().body(entityToDto(updated));
     }).orElse(ResponseEntity.notFound().build());
 
     }
-    
+
     @DeleteMapping(path ={"/{id}"})
 	public ResponseEntity <?> delete(@PathVariable long id) {
 	   return _cursoRepository.findById(id)
@@ -104,6 +117,20 @@ public class CursoController {
         return true;
 
        
+    }
+
+    private CursoDTO entityToDto(Curso curso){
+        modelMapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.LOOSE);
+        new CursoDTO();
+        return modelMapper.map(curso,CursoDTO.class);
+    }
+
+    private Curso dtoToEntity(CursoDTO curso){
+        modelMapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.LOOSE);
+        new Curso();
+        return modelMapper.map(curso,Curso.class);
     }
 
        

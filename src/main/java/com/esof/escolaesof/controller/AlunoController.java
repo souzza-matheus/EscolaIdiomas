@@ -1,11 +1,18 @@
 package com.esof.escolaesof.controller;
 
 import java.util.ArrayList;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+
+import com.esof.escolaesof.dto.AlunoDTO;
 import com.esof.escolaesof.exception.ContatoDeResponsavelNotFoundException;
 import com.esof.escolaesof.exception.NomeDeResponsavelNotFoundException;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,15 +35,17 @@ import lombok.AllArgsConstructor;
 public class AlunoController {
 
     private final AlunoRepository alunoRepository;
+    private final ModelMapper modelMapper;
 
     @GetMapping
-    public ResponseEntity<List<Aluno>> listarTodosAlunos(){
-        return ResponseEntity.ok( new ArrayList<>(alunoRepository.findAll()));
+    public ResponseEntity<List<AlunoDTO>> listarTodosAlunos(){
+        return ResponseEntity.ok(alunoRepository.findAll().stream().map(this::entityToDto)
+                        .collect(Collectors.toList()));
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<Aluno> cadastrarAluno(@RequestBody Aluno aluno ) throws ContatoDeResponsavelNotFoundException, NomeDeResponsavelNotFoundException {
+    public ResponseEntity<AlunoDTO> cadastrarAluno(@RequestBody @Valid AlunoDTO aluno ) throws ContatoDeResponsavelNotFoundException, NomeDeResponsavelNotFoundException {
         if(aluno.getIdade() < 18 && aluno.getEmail_responsavel() == null || aluno.getIdade() < 18 && aluno.getTelefone_responsavel() == null ){
             throw new ContatoDeResponsavelNotFoundException();
         }
@@ -44,21 +53,22 @@ public class AlunoController {
             throw  new NomeDeResponsavelNotFoundException();
         }
 
-        Aluno novoAluno=  alunoRepository.save(aluno);
+        Aluno novoAluno=  alunoRepository.save(dtoToEntity(aluno));
 
-        return new ResponseEntity<>(novoAluno, HttpStatus.CREATED);
+        return new ResponseEntity<>(entityToDto(novoAluno), HttpStatus.CREATED);
     }
 
     @PutMapping("/{matricula}")
     @Transactional
-    public ResponseEntity<Aluno> atualizarAluno(@RequestBody Aluno alunoAtualizado, @PathVariable Long matricula) throws AlunoNotFoundException{
+    public ResponseEntity<AlunoDTO> atualizarAluno(@RequestBody @Valid AlunoDTO alunoAtualizado, @PathVariable Long matricula) throws AlunoNotFoundException{
        Aluno aluno = verifyIfExists(matricula);
         aluno.setEmail_responsavel(alunoAtualizado.getEmail_responsavel());
         aluno.setTelefone_responsavel(alunoAtualizado.getTelefone_responsavel());
         aluno.setCurso(alunoAtualizado.getCurso());
         aluno.setEmail(alunoAtualizado.getEmail());
         aluno.setTelefone(alunoAtualizado.getTelefone());
-        return new ResponseEntity<>(aluno, HttpStatus.OK);
+        alunoRepository.save(aluno);
+        return new ResponseEntity<>(entityToDto(aluno), HttpStatus.OK);
     }
 
     @DeleteMapping("/{matricula}")
@@ -73,37 +83,26 @@ public class AlunoController {
         return alunoRepository.findById(matricula).orElseThrow(()->new AlunoNotFoundException(matricula));
     }
 
-    public boolean validaAluno(Aluno aluno, ArrayList<String> validationMsg){
-
-        if(aluno.getNome() == null || aluno.getNome().isEmpty()){
-            validationMsg.add("Nome não pode ser vazio");
-            return false;
-        }
-        if(aluno.getIdade() < 0){
-            validationMsg.add("Idade não pode ser negativa");
-            return false;
-        }
-        if(aluno.getEmail() == null || aluno.getEmail().isEmpty()){
-            validationMsg.add("Email não pode ser vazio");
-            return false;
-        }
-        if(!validaEmail(aluno.getEmail())){
-            validationMsg.add("Email inválido");
-            return false;
-        }
-
-        if(aluno.getTelefone() == null || aluno.getTelefone().isEmpty()){
-            validationMsg.add("Telefone não pode ser vazio");
-            return false;
-        }
-        return true;
-        
-    }
 
     public boolean validaEmail(String Email){
-		
+
 		return Email.matches("^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$");
 
 	}
-    
+
+	private AlunoDTO entityToDto(Aluno aluno){
+        modelMapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.LOOSE);
+        new AlunoDTO();
+       return modelMapper.map(aluno,AlunoDTO.class);
+    }
+
+    private Aluno dtoToEntity(AlunoDTO aluno){
+        modelMapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.LOOSE);
+        new Aluno();
+        return modelMapper.map(aluno,Aluno.class);
+    }
+
+
 }
