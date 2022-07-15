@@ -45,7 +45,7 @@ public class ProfessorController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public String cadastrar(@RequestBody @Valid ProfessorDTO _professor) throws SQLException {
+	public ResponseEntity<ProfessorDTO> cadastrar(@RequestBody @Valid ProfessorDTO _professor) {
 
 		ArrayList<String> _validationMsgs = new ArrayList<String>();
 		String erroMsg = "";
@@ -53,12 +53,12 @@ public class ProfessorController {
 		if(validarProfessor(dtoToEntity(_professor), _validationMsgs)){
 			
 			try {			
-				_professorRepository.save(dtoToEntity(_professor));
-				return "Cadastro realizado com sucesso!";
+				Professor novoProfessor=  _professorRepository.save(dtoToEntity(_professor));
+		        return new ResponseEntity<>(entityToDto(novoProfessor), HttpStatus.CREATED);
 				
 			} catch (Exception e) {	
 
-				return "Falha ao realizar o cadastro";
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}	
 		}
 		else{
@@ -66,7 +66,7 @@ public class ProfessorController {
 				erroMsg += erro + ", ";
 				
 			}
-			return "Falha ao realizar o cadastro: " + erroMsg;
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	
 	
