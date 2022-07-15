@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.esof.escolaesof.exception.AlunoNotFoundException;
 import com.esof.escolaesof.model.Aluno;
 import com.esof.escolaesof.repository.AlunoRepository;
@@ -44,14 +46,14 @@ public class AlunoController {
     @Transactional
     public ResponseEntity<AlunoDTO> cadastrarAluno(@RequestBody @Valid AlunoDTO aluno ) throws ContatoDeResponsavelNotFoundException, NomeDeResponsavelNotFoundException {
         if(aluno.getIdade() < 18 && aluno.getEmail_responsavel() == null || aluno.getIdade() < 18 && aluno.getTelefone_responsavel() == null ){
-            throw new ContatoDeResponsavelNotFoundException();
+        	return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            
         }
         if(aluno.getIdade() < 18 && aluno.getNome_responsavel() == null){
-            throw  new NomeDeResponsavelNotFoundException();
+        	throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
         Aluno novoAluno=  alunoRepository.save(dtoToEntity(aluno));
-
         return new ResponseEntity<>(entityToDto(novoAluno), HttpStatus.CREATED);
     }
 
