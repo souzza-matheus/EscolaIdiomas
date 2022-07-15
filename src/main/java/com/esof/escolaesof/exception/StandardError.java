@@ -1,21 +1,28 @@
 package com.esof.escolaesof.exception;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.io.Serializable;
-import java.time.Instant;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import org.springframework.http.HttpStatus;
 
-@Getter
-@Setter
-@NoArgsConstructor
+import java.util.Date;
+
+@Data
 public class StandardError {
 
-    private Instant timestamp;
-    private Integer status;
-    private String error;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy HH:mm:SSSZ", timezone ="GMT-3")
+    private Date timeStamp;
+    private int httpStatusCode;
+    private HttpStatus httpStatus;
+    private String reason;
     private String message;
-    private String path;
+
+    public StandardError(int httpStatusCode, HttpStatus httpStatus, String reason, String message) {
+        this.timeStamp = new Date();
+        this.httpStatusCode = httpStatusCode;
+        this.httpStatus = httpStatus;
+        this.reason = reason;
+        this.message = message;
+    }
 
 }
