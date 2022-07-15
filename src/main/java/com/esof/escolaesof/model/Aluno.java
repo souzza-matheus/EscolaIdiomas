@@ -3,9 +3,9 @@ package com.esof.escolaesof.model;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.AllArgsConstructor;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 @Data
 @Entity

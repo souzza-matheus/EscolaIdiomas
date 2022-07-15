@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
+
 @SpringBootApplication
 @ComponentScan(basePackages = "com.esof.escolaesof")
 public class EscolaEsofApplication {
@@ -19,4 +20,5 @@ public class EscolaEsofApplication {
 	    ModelMapper modelMapper = new ModelMapper();
 	    return modelMapper;
     }
+
 }
