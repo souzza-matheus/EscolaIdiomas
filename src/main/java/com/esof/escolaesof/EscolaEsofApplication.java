@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
 @SpringBootApplication
@@ -17,8 +18,11 @@ public class EscolaEsofApplication {
 
 	@Bean
     public ModelMapper modelMapper(){
-	    ModelMapper modelMapper = new ModelMapper();
-	    return modelMapper;
+	    return  new ModelMapper();
     }
 
+	@Bean
+	public BCryptPasswordEncoder bCryptPasswordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }

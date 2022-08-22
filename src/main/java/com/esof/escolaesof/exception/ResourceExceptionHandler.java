@@ -1,13 +1,12 @@
 package com.esof.escolaesof.exception;
 
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.http.HttpMethod;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
+
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -31,10 +30,6 @@ public class ResourceExceptionHandler  implements ErrorController{
     public static final String ERROR_PATH = "/error";
 
 
-    @ExceptionHandler(TokenExpiredException.class)
-    public ResponseEntity<StandardError> tokenExpiredException(TokenExpiredException exception) {
-        return createHttpResponse(HttpStatus.UNAUTHORIZED, exception.getMessage());
-    }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<StandardError> emailExistException(EmailAlreadyExistsException exception) {
